@@ -1,63 +1,60 @@
-// 1. Функция для проверки длины строки
-function checkStringLength(string, maxLength) {
-  return string.length <= maxLength;
-}
+const checkLength = (string = '', maxLength = 1) => (string.length <= maxLength);
 
-// 2. Функция для проверки палиндрома
-function isPalindrome(string) {
-  const cleanString = string.toLowerCase().replace(/\s/g, '');
-  return cleanString === cleanString.split('').reverse().join('');
-}
-
-// 3. Функция для извлечения чисел из строки
-function extractNumber(input) {
-  const string = String(input);
-  const digits = string.replace(/\D/g, '');
-
-  if (digits.length === 0) {
-    return NaN;
+const checkPalindrome = function (string = '') {
+  string = string.toLowerCase().replaceAll(' ', '');
+  let result = '';
+  for (let i = string.length - 1; i >= 0; i--) {
+    result += string[i];
   }
+  return result === string;
+};
 
-  return parseInt(digits, 10);
-}
-const checkTime = function(dayStart, dayEnd, meetingStart, meetingDuration){
-  let dayStartInMin = 0;
-  let dayEndInMin = 0;
-  let meetingStartInMin = 0;
 
-  dayStart = dayStart.split(':');
-  dayStartInMin += Number(dayStart[0]) * 60 + Number(dayStart[1]);
+const findNumbers = function (string) {
+  let result = '';
+  if (!string.isNaN) {
+    string = string.toString();
+  }
+  for (let i = 0; i < string.length; i++) {
+    if (string[i] >= 0 && string[i] <= 9) {
+      result += string[i];
+    }
+  }
+  return parseInt(result.replaceAll(' ', ''), 10);
+};
 
-  dayEnd = dayEnd.split(':');
-  dayEndInMin += Number(dayEnd[0]) * 60 + Number(dayEnd[1]);
+checkLength();
+checkPalindrome();
+findNumbers();
 
-  meetingStart = meetingStart.split(':');
-  meetingStartInMin += Number(meetingStart[0]) * 60 + Number(meetingStart[1]);
+const normalizeType = function (array) {
+  if (array[0][0] === '0') {
+    array[0] = String(array[0]).substring(1);
+  }
+  if (array[1][0] === '0' && array[1].length === 2) {
+    array[1] = String(array[1]).substring(1);
+  }
+  return array;
+};
 
-  if (dayStartInMin <= meetingStartInMin && meetingStartInMin <= dayEndInMin && ((dayEndInMin - meetingStartInMin) >= meetingDuration)){
-    return true;
+const timeToMinutes = function (array) {
+  return (+array[0] * 60 + +array[1]);
+};
+
+const isOutOfBounds = function (workdayStartTime = '', workdayEndTime = '',
+  meetingStartTime = '', meetingDuration = 0) {
+  const workStartTime = timeToMinutes(normalizeType(workdayStartTime.split(':')));
+  const workEndTime = timeToMinutes(normalizeType(workdayEndTime.split(':')));
+  const meetStartTime = timeToMinutes(normalizeType(meetingStartTime.split(':')));
+
+  if (workStartTime > meetStartTime) {
+    return false;
+  } else {
+    if (meetStartTime + meetingDuration <= workEndTime) {
+      return true;
+    }
   }
   return false;
 };
 
-checkTime('8:0', '10:0', '8:0', 120);
-// Проверка длины строки
-checkStringLength('проверяемая строка', 20); // true
-checkStringLength('проверяемая строка', 18); // true
-checkStringLength('проверяемая строка', 10); // false
-
-// Проверка палиндрома
-isPalindrome('топот'); // true
-isPalindrome('Довод'); // true
-isPalindrome('Кекс'); // false
-isPalindrome('Лёша на полке клопа нашёл '); // true
-
-// Извлечение чисел
-extractNumber('2023 год'); // 2023
-extractNumber('ECMAScript 2022'); // 2022
-extractNumber('1 кефир, 0.5 батона'); // 105
-extractNumber('агент 007'); // 7
-extractNumber('a я томат'); // NaN
-extractNumber(2023); // 2023
-extractNumber(-1); // 1
-extractNumber(1.5); // 15
+isOutOfBounds();
