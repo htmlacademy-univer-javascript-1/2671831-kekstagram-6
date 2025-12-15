@@ -1,36 +1,20 @@
-import './pictures.js';
-import { loadData, uploadData } from './fetch.js';
-import { renderPhotos } from './pictures.js';
-import './hashtags.js';
-import './slider-and-control.js';
-import './filters.js';
-import './own-photos.js';
-import { showAlert } from './util.js';
-import { showErrorMessage, showSuccessMessage } from './messages.js';
-import { hideModal, setOnFormSubmit } from './hashtags.js';
+import { renderThumbnails } from './thumbnails.js';
+import { loadPictures } from './api.js';
+import { showLoadError } from './messages.js';
+import { initFilters } from './filters.js';
+import './form.js';
 
-let photos;
-
-const onSuccess = (data) => {
-  photos = data.slice();
-  renderPhotos(data.slice());
-  document.querySelector('.img-filters').classList.remove('img-filters--inactive');
+const initApp = () => {
+  loadPictures()
+    .then((pictures) => {
+      renderThumbnails(pictures);
+      initFilters(pictures);
+    })
+    .catch((error) => {
+      showLoadError(error.message);
+    });
 };
 
-const onFail = () => {
-  showAlert('Произошла ошибка при загрузке фотографий');
-};
+document.addEventListener('DOMContentLoaded', initApp);
 
-loadData(onSuccess, onFail);
 
-setOnFormSubmit(async (data) => {
-  try {
-    uploadData(data);
-    hideModal();
-    showSuccessMessage();
-  } catch (e) {
-    showErrorMessage();
-  }
-});
-
-export { photos };
